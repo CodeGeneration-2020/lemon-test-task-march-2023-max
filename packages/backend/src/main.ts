@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { swaggerKey } from './constants';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,7 +19,7 @@ async function bootstrap() {
     deepScanRoutes: true,
   });
 
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup(swaggerKey, app, document);
 
   app.useGlobalPipes(new ValidationPipe());
 

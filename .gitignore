@@ -1,4 +1,6 @@
-backend/dist
-backend/node_modules
-backend/.logs
-frontend/node_modules
+node_modules/
+dist/
+packages/backend/dist
+packages/backend/node_modules
+packages/backend/.logs
+packages/frontend/node_modules

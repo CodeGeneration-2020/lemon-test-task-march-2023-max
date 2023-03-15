@@ -8,6 +8,7 @@ import { getRandomSubset } from 'src/shared/utils/random.utils';
 import { IGetAlbums } from '../../types/itunes-api.types';
 import { artists } from './constants';
 import { newAlbumsLogger } from '../../logger';
+import { iTunesApi } from '../../constants';
 
 @Injectable()
 export class ArtistService {
@@ -61,7 +62,7 @@ export class ArtistService {
   }
 
   async getAlbums(artist: string) {
-    const url = 'https://itunes.apple.com/search';
+    const url = `${iTunesApi}/search`;
     const params = {
       media: 'music',
       entity: 'album',
