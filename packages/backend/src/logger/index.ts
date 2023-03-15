@@ -1,2 +1,1 @@
-export * from './new-albums';
-export * from './top-users';
+export * from './logger.service';

@@ -1,11 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { topUsersLogger } from 'src/logger';
+import { LoggerService } from '../../logger';
 import { User } from '../../entities/user.entity';
 import { SubmitScoreDTO } from './dto';
+import { loggerFiles } from '../../constants';
 
 @Injectable()
 export class UserService {
+  constructor(private readonly logger: LoggerService) {}
+
   async submitScore(body: SubmitScoreDTO) {
     const user = await User.findOne({ where: { username: body.username } });
 
@@ -25,10 +28,11 @@ export class UserService {
   @Cron(CronExpression.EVERY_DAY_AT_2PM)
   async logTopUser() {
     const users = await this.getTopUsers(3);
-    topUsersLogger.info(
+    this.logger.log(
       `Top users: ${users
         .map((user) => `${user.username} - ${user.score}`)
         .join(', ')}`,
+      loggerFiles.topUsers,
     );
   }
 

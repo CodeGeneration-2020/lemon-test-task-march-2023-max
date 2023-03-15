@@ -1,7 +1,8 @@
 import styled from 'styled-components';
+import { SPACES } from '../../theme';
 
 const Button = styled('button')`
-  padding: 10px 20px;
+  padding: ${SPACES.m} ${SPACES.xxl};
   border-radius: 6px;
   cursor: pointer;
 `;

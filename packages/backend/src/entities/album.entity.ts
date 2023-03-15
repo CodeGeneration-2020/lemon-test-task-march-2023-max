@@ -4,9 +4,9 @@ import { EnhancedBaseEntity } from './enhanced-base.entity';
 
 @Entity({ name: 'albums' })
 export class Album extends EnhancedBaseEntity {
-  @ApiColumn('Name', { nullable: true })
-  name: string;
+  @ApiColumn('name')
+  name?: string;
 
-  @ApiColumn('Artist', { nullable: true })
-  artist: string;
+  @ApiColumn('artist')
+  artist?: string;
 }

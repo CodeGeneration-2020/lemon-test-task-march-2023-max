@@ -7,12 +7,15 @@ import { Album } from '../../entities/album.entity';
 import { getRandomSubset } from 'src/shared/utils/random.utils';
 import { IGetAlbums } from '../../types/itunes-api.types';
 import { artists } from './constants';
-import { newAlbumsLogger } from '../../logger';
-import { iTunesApi } from '../../constants';
+import { iTunesApi, loggerFiles } from '../../constants';
+import { LoggerService } from '../../logger/logger.service';
 
 @Injectable()
 export class ArtistService {
-  constructor(private httpService: HttpService) {}
+  constructor(
+    private httpService: HttpService,
+    private readonly logger: LoggerService,
+  ) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_2PM)
   fetchAlbums() {
@@ -30,8 +33,9 @@ export class ArtistService {
           .values(newAlbums.map((album) => ({ artist, name: album })))
           .execute()
           .then(() => {
-            newAlbumsLogger.info(
+            this.logger.log(
               `New albums available for ${artist}: ${newAlbums.join(' | ')}`,
+              loggerFiles.newAlbums,
             );
           });
       }
@@ -61,7 +65,7 @@ export class ArtistService {
     return randomAlbums;
   }
 
-  async getAlbums(artist: string) {
+  async getAlbums(artist: string): Promise<string[]> {
     const url = `${iTunesApi}/search`;
     const params = {
       media: 'music',
@@ -82,7 +86,7 @@ export class ArtistService {
       ),
     );
 
-    const randomAlbums = getRandomSubset(albums, 5);
+    const randomAlbums = getRandomSubset<string>(albums, 5);
     return randomAlbums;
   }
 }
