@@ -18,7 +18,13 @@ const ResultTitle = styled('div')<{ isWin: boolean }>`
   font-size: 25px;
 `;
 
+const TopPlayersTitle = styled('div')`
+  font-weight: 700;
+  font-size: 25px;
+`;
+
 export const Styled = {
   Wrapper,
   ResultTitle,
+  TopPlayersTitle,
 }

@@ -1,18 +1,49 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { lastValueFrom } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Album } from '../../entities/album.entity';
 import { getRandomSubset } from 'src/shared/utils/random.utils';
 import { IGetAlbums } from '../../types/itunes-api.types';
 import { artists } from './constants';
+import { newAlbumsLogger } from '../../logger';
 
 @Injectable()
 export class ArtistService {
   constructor(private httpService: HttpService) {}
 
+  @Cron(CronExpression.EVERY_DAY_AT_2PM)
+  fetchAlbums() {
+    artists.forEach(async (artist) => {
+      const albums = await this.getAlbums(artist);
+      const existing = (await Album.find({ where: { artist } })).map(
+        (album) => album.name,
+      );
+      const newAlbums = albums.filter((album) => !existing.includes(album));
+
+      if (newAlbums.length > 0) {
+        await Album.createQueryBuilder()
+          .insert()
+          .into(Album)
+          .values(newAlbums.map((album) => ({ artist, name: album })))
+          .execute()
+          .then(() => {
+            newAlbumsLogger.info(
+              `New albums available for ${artist}: ${newAlbums.join(' | ')}`,
+            );
+          });
+      }
+    });
+  }
+
   async startGame() {
     const artist = getRandomSubset(artists, 1).at(0);
-    const albums = await this.getAlbums(artist);
+    let albums = await this.getStoredAlbums(artist);
+
+    if (albums.length < 5) {
+      albums = await this.getAlbums(artist);
+    }
 
     return {
       artist,
@@ -20,13 +51,22 @@ export class ArtistService {
     };
   }
 
-  async getAlbums(name: string) {
+  async getStoredAlbums(artist: string) {
+    const albums = (await Album.find({ where: { artist } })).map(
+      (album) => album.name,
+    );
+
+    const randomAlbums = getRandomSubset(albums, 5);
+    return randomAlbums;
+  }
+
+  async getAlbums(artist: string) {
     const url = 'https://itunes.apple.com/search';
     const params = {
       media: 'music',
       entity: 'album',
       attribute: 'artistTerm',
-      term: name,
+      term: artist,
     };
 
     const albums = await lastValueFrom(
@@ -34,7 +74,7 @@ export class ArtistService {
         map((response) => response.data.results),
         map((results) =>
           results.filter(
-            (item) => item.artistName.toLowerCase() === name.toLowerCase(),
+            (item) => item.artistName.toLowerCase() === artist.toLowerCase(),
           ),
         ),
         map((albums) => albums.map((album) => album.collectionName)),

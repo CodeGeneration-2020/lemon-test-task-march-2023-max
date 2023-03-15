@@ -1,6 +1,4 @@
-import axios from 'axios';
 import { GameService } from '../services/game.service';
-import { IStartGameResponse } from '../types/game.types';
 
 export class GameController {
   readonly gameService: GameService = new GameService()
@@ -39,6 +37,7 @@ export class GameController {
   }
 
   public async submitResult(username: string, isWin: boolean) {
-    await this.gameService.submitResult(username, isWin);
+    const users = await this.gameService.submitResult(username, isWin);
+    return users;
   }
 }

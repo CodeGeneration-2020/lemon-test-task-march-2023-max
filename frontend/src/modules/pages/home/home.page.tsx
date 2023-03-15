@@ -19,6 +19,7 @@ const HomePage = () => {
   const resetGame = () => {
     gameController.reset();
     setGameStarted(false);
+    startHandler();
   }
 
   return (

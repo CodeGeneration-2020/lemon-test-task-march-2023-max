@@ -33,7 +33,6 @@ function getSSLConfig(env: string) {
       ssl: getSSLConfig(process.env.SERVER_MODE),
     }),
   ],
-
   providers: [ConfigModule, ConfigService],
   exports: [TypeOrmModule, ConfigModule, ConfigService],
 })

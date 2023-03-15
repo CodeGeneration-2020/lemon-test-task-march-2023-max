@@ -1,5 +1,5 @@
 import axios from "axios";
-import { IStartGameResponse } from "../types/game.types";
+import { IStartGameResponse, IUser } from "../types/game.types";
 
 export class GameService {
   async startGame(): Promise<IStartGameResponse> {
@@ -8,9 +8,10 @@ export class GameService {
   }
 
   async submitResult(username: string, isWin: boolean) {
-    await axios.post(`${process.env['API_URL']}/user/submit`, {
+    const { data } = await axios.post<IUser[]>(`${process.env['API_URL']}/user/submit`, {
       username,
       result: isWin,
     });
+    return data;
   }
 }
